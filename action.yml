@@ -16,6 +16,9 @@ inputs:
   workflowFileName:
     description: 'workflow file name to trigger'
     required: true
+  workflowName:
+    description: 'workflow name to check'
+    required: true
   checkForChangesIn:
     description: 'path to folder watched for changes'
     required: true
@@ -31,6 +34,6 @@ runs:
     - id: filechangetrigger
       run: |
         ${{ github.action_path }}/Start-TriggerOnChange.ps1 -Owner ${{ inputs.owner }} -TriggerOwner ${{ inputs.triggerOwner }} -Repository ${{ inputs.repository }} `
-         -TriggerRepository ${{ inputs.triggerRepository }} -WorkflowFileName ${{ inputs.workflowFileName }} `
+         -TriggerRepository ${{ inputs.triggerRepository }} -WorkflowFileName ${{ inputs.workflowFileName }} -WorkflowName "${{ inputs.workflowName }}" `
          -CheckForChangesIn ${{ inputs.checkForChangesIn }} -Username ${{ inputs.username }} -AuthToken ${{ inputs.authToken }}
       shell: pwsh

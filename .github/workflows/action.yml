@@ -17,6 +17,7 @@ jobs:
           repository: "file-change-trigger"
           triggerRepository: "distributed-portfolio"
           workflowFileName: "action.yml"
+          workflowName: "Build and deploy"
           checkForChangesIn: ".portfolio"
           username: "krzysztofzajaczkowski"
           authToken: ${{ secrets.REPO_SCOPE_TOKEN }}

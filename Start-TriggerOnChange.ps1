@@ -13,6 +13,8 @@
     Name of triggered repository
     .PARAMETER workflowFileName
     Name of workflow file to trigger
+    .PARAMETER workflowName
+    Name of workflow to check
     .PARAMETER checkForChangesIn
     Path to directory/file to check for updates
     .PARAMETER username
@@ -38,6 +40,9 @@
 
         [parameter(Mandatory = $true)]
         [string]$WorkflowFileName,
+
+        [parameter(Mandatory = $true)]
+        [string]$WorkflowName,
 
         [parameter(Mandatory = $true)]
         [string]$CheckForChangesIn,
@@ -73,17 +78,20 @@
         # select last successful workflow run date by selecting first element from workflow_runs
         # where workflow name matches, status is completed" and conclusion is "success" and accessing member .run_started_at
         $lastSuccessfulRunDate = (($workflowRunsResponse | ConvertFrom-Json).workflow_runs | Where-Object `
-         {($_.name -eq $WorkflowFileName) -and ($_.status -eq "completed") -and ($_.conclusion -eq "success")} | Select-Object -First 1).run_started_at
+         {($_.name -eq $WorkflowName) -and ($_.status -eq "completed") -and ($_.conclusion -eq "success")} | Select-Object -First 1).run_started_at
 
         # if date of last change is later than date of last workflow
         if ($commitDate -gt $lastSuccessfulRunDate) {
             # trigger workflow
             $triggerWorkflowUri = "https://api.github.com/repos/$($TriggerOwner)/$($TriggerRepository)/actions/workflows/$($WorkflowFileName)/dispatches"
-            $body = @{ref='master';}
-            $triggerWorkflowResponse = Invoke-WebRequest -Uri $triggerWorkflowUri -Headers @{"Authorization"="Basic $token"} -SkipHttpErrorCheck -Method POST -Body $body
+            $body = @{
+                "ref"="master"
+            }
+            $triggerWorkflowResponse = Invoke-WebRequest -Uri $triggerWorkflowUri -Headers @{"Authorization"="Basic $token"} -SkipHttpErrorCheck -Method POST `
+                -Body ($body|ConvertTo-Json) -ContentType "application/json"
 
             if ($triggerWorkflowResponse.StatusCode -ne 204) {
-                throw "Triggering $($TriggerRepository) workflow has failed!"
+                throw "Triggering $($TriggerRepository) workflow has failed with message $($triggerWorkflowResponse.Content)!"
             }
 
         }
