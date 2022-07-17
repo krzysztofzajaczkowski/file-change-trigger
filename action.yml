@@ -1,0 +1,36 @@
+name: 'File change trigger'
+description: "Trigger GitHub workflow in specified repository on file updates in repository that contains this action"
+inputs:
+  owner: 
+    description: 'owner of repository to check ofr changes'
+    required: true
+  triggerOwner: 
+    description: 'owner of repository to trigger'
+    required: true
+  repository:
+    description: 'name of repository to check for changes'
+    required: true
+  triggerRepository:
+    description: 'name of repository to trigger'
+    required: true
+  workflowFileName:
+    description: 'workflow file name to trigger'
+    required: true
+  checkForChangesIn:
+    description: 'path to folder watched for changes'
+    required: true
+  username:
+    description: 'username for GitHub API calls authentication'
+    required: true
+  authToken:
+    description: 'token for GitHub API calls authentication'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - id: filechangetrigger
+      run: |
+        ${{ github.action_path }}/Start-TriggerOnChange.ps1 -Owner ${{ inputs.owner }} -TriggerOwner ${{ inputs.triggerOwner }} -Repository ${{ inputs.repository }} `
+         -TriggerRepository ${{ inputs.triggerRepository }} -WorkflowFileName ${{ inputs.workflowFileName }} `
+         -CheckForChangesIn ${{ inputs.checkForChangesIn }} -Username ${{ inputs.username }} -AuthToken ${{ inputs.authToken }}
+      shell: pwsh
