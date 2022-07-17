@@ -1,0 +1,22 @@
+name: "Trigger portfolio build if updated"
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: krzysztofzajaczkowski/file-change-trigger@master
+        with:
+          owner: "krzysztofzajaczkowski"
+          triggerOwner: "krzysztofzajaczkowski"
+          repository: "file-change-trigger"
+          triggerRepository: "distributed-portfolio"
+          workflowFileName: "action.yml"
+          checkForChangesIn: ".portfolio"
+          username: "krzysztofzajaczkowski"
+          authToken: ${{ secrets.REPO_SCOPE_TOKEN }}
